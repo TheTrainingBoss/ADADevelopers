@@ -25,5 +25,7 @@ namespace ADA.Mvc.Models
         public Enumeration Enum { get; set; }
         public int Number { get; set; }
         public DateTime MyDate { get; set; }
+        public string ImageUrl { get; set; }
+        public string PressRelease { get; set; }
     }
 }

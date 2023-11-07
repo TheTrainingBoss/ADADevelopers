@@ -31,6 +31,16 @@ namespace ADA.Mvc.Controllers
 			model.Number = this.Number;	
 			model.Flag = this.Flag;
 			model.Enum = this.Enum;		
+
+
+			var lbmanager = LibrariesManager.GetManager();
+			var image = lbmanager.GetImage(Guid.Parse(this.Images.ItemIdsOrdered[0]));
+			model.ImageUrl = image.MediaUrl;
+
+			var nm = NewsManager.GetManager();
+			var press = nm.GetNewsItem(Guid.Parse(this.MyNews.ItemIdsOrdered[0]));
+			model.PressRelease = press.Title;
+
 			return View(model);
 		}
 		public ActionResult Joe()
