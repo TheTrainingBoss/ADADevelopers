@@ -4,6 +4,8 @@
 </auto-generated>
 ------------------------------------------------------------------------------ */
 
+using Progress.Sitefinity.Renderer.Designers.Attributes;
+using Progress.Sitefinity.Renderer.Entities.Content;
 using System;
 using System.Web.Mvc;
 using Telerik.Sitefinity.Mvc;

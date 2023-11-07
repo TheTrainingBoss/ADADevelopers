@@ -10,8 +10,12 @@ using Progress.Sitefinity.Renderer.Entities.Content;
 using System;
 using System.ComponentModel;
 using System.Web.Mvc;
+using Telerik.Sitefinity.Modules.Libraries;
+using Telerik.Sitefinity.Modules.News;
+using Telerik.Sitefinity.Modules.Pages;
 using Telerik.Sitefinity.Mvc;
 using Telerik.Sitefinity.Personalization;
+using Telerik.Sitefinity.RelatedData;
 
 namespace ADA.Mvc.Controllers
 {
@@ -26,7 +30,7 @@ namespace ADA.Mvc.Controllers
 			model.MyDate = this.MyDate;
 			model.Number = this.Number;	
 			model.Flag = this.Flag;
-			model.Enum = this.Enum;
+			model.Enum = this.Enum;		
 			return View(model);
 		}
 		public ActionResult Joe()
@@ -49,7 +53,7 @@ namespace ADA.Mvc.Controllers
         public DateTime MyDate { get; set; }
 
 		[Content(Type=KnownContentTypes.Pages)]
-		public MixedContentContext Page { get; set; }
+		public MixedContentContext Pages { get; set; }
 
         [Content(Type = KnownContentTypes.Images)]
         public MixedContentContext Images { get; set; }
