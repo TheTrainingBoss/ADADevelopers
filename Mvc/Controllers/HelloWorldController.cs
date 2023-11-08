@@ -5,15 +5,21 @@
 ------------------------------------------------------------------------------ */
 
 using ADA.Mvc.Models;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using Progress.Sitefinity.Renderer.Designers.Attributes;
 using Progress.Sitefinity.Renderer.Entities.Content;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Web.Mvc;
+using Telerik.Sitefinity.Data;
 using Telerik.Sitefinity.Modules.Libraries;
 using Telerik.Sitefinity.Modules.News;
 using Telerik.Sitefinity.Modules.Pages;
 using Telerik.Sitefinity.Mvc;
+using Telerik.Sitefinity.Mvc.Proxy;
+using Telerik.Sitefinity.Pages.Model;
 using Telerik.Sitefinity.Personalization;
 using Telerik.Sitefinity.RelatedData;
 
@@ -30,16 +36,22 @@ namespace ADA.Mvc.Controllers
 			model.MyDate = this.MyDate;
 			model.Number = this.Number;	
 			model.Flag = this.Flag;
-			model.Enum = this.Enum;		
+			model.Enum = this.Enum;
 
 
-			var lbmanager = LibrariesManager.GetManager();
-			var image = lbmanager.GetImage(Guid.Parse(this.Images.ItemIdsOrdered[0]));
-			model.ImageUrl = image.MediaUrl;
+            if (this.Images != null)
+            {
+                var lbmanager = LibrariesManager.GetManager();
+                var image = lbmanager.GetImage(Guid.Parse(this.Images.ItemIdsOrdered[0]));
+                model.ImageUrl = image.MediaUrl;
+            }
 
-			var nm = NewsManager.GetManager();
-			var press = nm.GetNewsItem(Guid.Parse(this.MyNews.ItemIdsOrdered[0]));
-			model.PressRelease = press.Title;
+            if (this.MyNews != null)
+            {
+                var nm = NewsManager.GetManager();
+                var press = nm.GetNewsItem(Guid.Parse(this.MyNews.ItemIdsOrdered[0]));
+                model.PressRelease = press.Title;
+            }
 
 			return View(model);
 		}
@@ -49,7 +61,7 @@ namespace ADA.Mvc.Controllers
 			return View();
 		}
 
-
+		
         protected override void HandleUnknownAction(string actionName)
         {
             this.ActionInvoker.InvokeAction(this.ControllerContext, "Index");

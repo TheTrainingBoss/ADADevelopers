@@ -5,28 +5,64 @@
 ------------------------------------------------------------------------------ */
 
 using ADA.Mvc.Models;
+using System;
 using System.Linq;
 using System.Web.Mvc;
 using Telerik.Sitefinity.GenericContent.Model;
 using Telerik.Sitefinity.Modules.Pages;
 using Telerik.Sitefinity.Mvc;
 using Telerik.Sitefinity.Personalization;
+using Telerik.Sitefinity.Pages.Model;
+using Telerik.Sitefinity.Abstractions;
+using System.Text.RegularExpressions;
+using Telerik.Sitefinity.Security.Claims;
+using System.Collections.Generic;
+using Telerik.Sitefinity.Workflow;
 
 namespace ADA.Mvc.Controllers
 {
 	[ControllerToolboxItem(Name = "PageCrud", Title = "Page Crud", SectionName = "ADA")]
 	public class PageCrudController : Controller, IPersonalizable
 	{
-		// GET: PageCrud
-		public ActionResult Index()
+        PageManager pm = PageManager.GetManager();
+        // GET: PageCrud
+        public ActionResult Index()
 		{
-			PageManager pm = PageManager.GetManager();
+			
 			var pages = pm.GetPageDataList().Where(p => p.Status == ContentLifecycleStatus.Live)
 											.Select(p => p.NavigationNode)
 											.Where(n => !n.IsBackend && !n.IsDeleted);
 
 			var model = new PageCrudModel(pages);
 			return View("Index", model);
+		}
+
+		public ActionResult CreatePage()
+		{
+			var name = "Training Page";
+			var id = Guid.NewGuid();
+
+			var parent = pm.GetPageNode(SiteInitializer.CurrentFrontendRootNodeId);
+			PageNode pageNode = pm.CreatePage(parent, id, NodeType.Standard);
+			pageNode.Name = name;
+            pageNode.Title = name;
+            pageNode.Description = name;
+			pageNode.UrlName = Regex.Replace(name.ToLower(), @"[^\w\-\!\$\'\(\)\=\@\d_]+", "-");
+            pageNode.ShowInNavigation = true;
+            pageNode.DateCreated = DateTime.Now;
+            pageNode.LastModified = DateTime.UtcNow;
+            pageNode.Owner = ClaimsManager.GetCurrentUserId();
+			PageData pageData = pageNode.GetPageData();
+			pageData.HtmlTitle = name + "Hello ADA";
+			pageData.Visible = true;
+			pm.SaveChanges();
+
+            var bag = new Dictionary<string, string>();
+            bag.Add("ContentType", typeof(PageNode).FullName);
+            WorkflowManager.MessageWorkflow(id, typeof(PageNode), null, "Publish", false, bag);
+
+
+            return View("CreatePage");
 		}
 		
         protected override void HandleUnknownAction(string actionName)
