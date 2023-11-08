@@ -16,6 +16,9 @@ using System.Text.RegularExpressions;
 using Telerik.Sitefinity.News.Model;
 using Telerik.Sitefinity.Workflow;
 using System;
+using Telerik.Sitefinity.Pages.Model;
+using Telerik.Sitefinity.Modules.Pages;
+using Telerik.Sitefinity.Mvc.Proxy;
 
 namespace ADA.Mvc.Controllers
 {
@@ -66,6 +69,45 @@ namespace ADA.Mvc.Controllers
 
 
             return View("Update");
+        }
+
+        public ActionResult CoolStuff()
+        {
+            string templateTitle = "Mike";
+            string placeholderCaption = "grid-6+6";
+            int placeholderIndex = 0;
+            PageTemplate template;
+
+            PageManager pm = PageManager.GetManager();
+            var node = pm.GetPageNodes().Where(n => n.UrlName == "mike-page").FirstOrDefault();
+            var pagedata = node.GetPageData();
+
+            var page = pm.EditPage(pagedata.Id);
+
+            if (!string.IsNullOrEmpty(placeholderCaption))
+            {
+                MvcControllerProxy widget = new MvcControllerProxy();
+                widget.ControllerName = typeof(NewsCrudController).FullName;
+
+
+                //Dictionary<string, object> propsValues = new Dictionary<string, object>();
+                //propsValues.Add("Message", "My Message!");
+                //// Settings values is a Dictionary<string, object>
+                //foreach (var key in propsValues.Keys)
+                //{
+                //    widget.Settings.Values[key] = propsValues[key];
+                //}
+
+                template = pm.GetTemplates().Where(t => t.Title == templateTitle).FirstOrDefault();
+                string placeholderId = template.Controls.Where(c => c.Caption.Contains(placeholderCaption)).FirstOrDefault().PlaceHolders[placeholderIndex];
+                var widgetControl = pm.CreateControl<PageDraftControl>(widget, placeholderId);
+                widgetControl.Caption = "Hello World";
+                pm.SetControlDefaultPermissions(widgetControl);
+                page.Controls.Add(widgetControl);
+                pm.PublishPageDraft(page);
+                pm.SaveChanges();
+            }
+                return View("CoolStuff");
         }
 
         protected override void HandleUnknownAction(string actionName)
